@@ -16,6 +16,7 @@ import java.util.List;
 
 import lecho.lib.hellocharts.listener.ComboLineColumnChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.ComboLineColumnChartData;
@@ -47,7 +48,7 @@ public class ComboLineColumnChartActivity extends ActionBarActivity {
 
         private int numberOfLines = 1;
         private int maxNumberOfLines = 4;
-        private int numberOfPoints = 12;
+        private int numberOfPoints = 2;
 
         float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
 
@@ -150,7 +151,7 @@ public class ComboLineColumnChartActivity extends ActionBarActivity {
             data = new ComboLineColumnChartData(generateColumnData(), generateLineData());
 
             if (hasAxes) {
-                Axis axisX = new Axis();
+                Axis axisX = generateXAxis();
                 Axis axisY = new Axis().setHasLines(true);
                 if (hasAxesNames) {
                     axisX.setName("Axis X");
@@ -164,6 +165,20 @@ public class ComboLineColumnChartActivity extends ActionBarActivity {
             }
 
             chart.setComboLineColumnChartData(data);
+        }
+
+        private Axis generateXAxis() {
+            Axis axis = new Axis();
+            axis.setHasTiltedLabels(true);
+            axis.setMaxLabelChars(10);
+            ArrayList<AxisValue> values = new ArrayList<>();
+            for (int i = 0; i < numberOfPoints; i++) {
+                values.add(new AxisValue(i)
+                        .setLabel("10.31 12:00")
+                );
+            }
+            axis.setValues(values);
+            return axis;
         }
 
         private LineChartData generateLineData() {
