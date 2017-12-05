@@ -3,6 +3,7 @@ package lecho.lib.hellocharts.samples;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lecho.lib.hellocharts.listener.ComboLineColumnChartOnValueSelectListener;
+import lecho.lib.hellocharts.listener.ViewportChangeListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
@@ -24,10 +26,14 @@ import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
+import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ComboLineColumnChartView;
 
 public class ComboLineColumnChartActivity extends ActionBarActivity {
+
+
+    public static final String TAG = ComboLineColumnChartActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +54,7 @@ public class ComboLineColumnChartActivity extends ActionBarActivity {
 
         private int numberOfLines = 1;
         private int maxNumberOfLines = 4;
-        private int numberOfPoints = 2;
+        private int numberOfPoints = 50;
 
         float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
 
@@ -72,8 +78,47 @@ public class ComboLineColumnChartActivity extends ActionBarActivity {
 
             generateValues();
             generateData();
+            adjustChart();
 
             return rootView;
+        }
+
+        /**
+         * 调整统计图
+         */
+        private void adjustChart() {
+            Viewport viewport = new Viewport(chart.getMaximumViewport());
+            viewport.top = 10;
+            viewport.bottom = 0;
+            chart.setMaximumViewport(viewport);
+
+
+            Viewport maximumViewport = new Viewport(chart.getMaximumViewport());
+            maximumViewport.left = 0;
+            maximumViewport.right = 12;
+
+            chart.setCurrentViewport(maximumViewport);
+
+
+
+            chart.setZoomEnabled(false);
+
+            chart.setViewportCalculationEnabled(false);
+
+            //监听滑动到了第几个条目
+            chart.setViewportChangeListener(new ViewportChangeListener() {
+
+
+                @Override
+                public void onViewportChanged(Viewport viewport) {
+                    float left = viewport.left;
+                    Log.d(TAG, "onViewportChanged left = "
+                            + Math.round(left)
+                    );
+                }
+            });
+            chart.invalidate();
+
         }
 
         // MENU
@@ -174,7 +219,8 @@ public class ComboLineColumnChartActivity extends ActionBarActivity {
             ArrayList<AxisValue> values = new ArrayList<>();
             for (int i = 0; i < numberOfPoints; i++) {
                 values.add(new AxisValue(i)
-                        .setLabel("10.31 12:00")
+//                        .setLabel("10.31 12:00")
+                                .setLabel(i + "")
                 );
             }
             axis.setValues(values);
@@ -208,7 +254,7 @@ public class ComboLineColumnChartActivity extends ActionBarActivity {
 
         private ColumnChartData generateColumnData() {
             int numSubcolumns = 1;
-            int numColumns = 12;
+            int numColumns = numberOfPoints;
             // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
             List<Column> columns = new ArrayList<Column>();
             List<SubcolumnValue> values;
